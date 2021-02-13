@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<body style="background-color:beige">
+
+<h2 style="color:cadetBlue"><u>Bowling Score Calculator</u></h2>
+
+Please enter the bowling score string:
+<input id="knockDownPinCountString" type="text" size=50/>
+<p>
+<button id="calculate" type="button" style="border-radius:10px; background-color:ivory" onclick=CalculateScore()>Calculate Score</button>
+<p id="bowlingScore"></p>
+
+<script>
+const FRAMESCORE_MAXIMUM = 10;
+
+function CalculateScore()
+{
+    var aBowlingFrame;
+    
+	aBowlingFrame = GetNewBowlingFrameArray (12);
+
+	SetBowlingGameScore (aBowlingFrame, document.getElementById ("knockDownPinCountString").value);
+
+	document.getElementById ("bowlingScore").innerHTML = "Total Score: " + "<b style='color:red'>" + GetBowlingGameScore (aBowlingFrame) + "</b>";
+}
+
+function IsStrike(tFrame)
+{
+	return ( (IsFrameScoreValid (tFrame)) && (tFrame[0] == FRAMESCORE_MAXIMUM) );
+}
+
+function IsSpare(tFrame)
+{
+	return ( (IsFrameScoreValid (tFrame)) && (tFrame[0] < FRAMESCORE_MAXIMUM) && (GetFrameScore (tFrame) == FRAMESCORE_MAXIMUM) );
+}
+
+function GetFrameScore(tFrame)
+{
+	return ( (IsFrameScoreValid (tFrame)) ? (tFrame[0] + tFrame[1]) : 0);
+}
+
+function IsFrameScoreValid(tFrame)
+{
+	return ( (tFrame.length == 2) && (tFrame[0] >= 0) && (tFrame[1] >= 0) && ((tFrame[0] + tFrame[1]) <= FRAMESCORE_MAXIMUM) )
+	
+}
+
+function GetNewBowlingFrameArray(iBowlingFrameCount)
+{
+	var iIndex;
+	var aArray;
+
+	aArray = [];
+	if (iBowlingFrameCount > 0)
+    	for (iIndex = 0; iIndex < iBowlingFrameCount; iIndex++)
+			aArray[iIndex] = [0, 0];
+
+	return aArray;
+}
+
+function SetBowlingGameScore(aBowlingFrame, szKnockDownPinCountString)
+{
+	var	aKnockDownPinCount;
+	var iBowlingScore;
+    var iFrameIndex;
+	var bTrial0Enabled;
+    var iIndex;
+
+	aKnockDownPinCount	= szKnockDownPinCountString.split (',');
+	iFrameIndex     	= 0;
+	bTrial0Enabled  	= true;
+    
+	for (iIndex = 0; iIndex < aKnockDownPinCount.length; iIndex++)
+    {
+		iBowlingScore = parseInt (aKnockDownPinCount[iIndex]);
+
+		if (bTrial0Enabled)
+		{
+			aBowlingFrame[iFrameIndex][0] = iBowlingScore;
+
+			if (bTrial0Enabled = (iBowlingScore == FRAMESCORE_MAXIMUM))
+				aBowlingFrame[iFrameIndex++][1] = 0;
+		}
+		else
+		{
+			aBowlingFrame[iFrameIndex++][1] = iBowlingScore;
+			bTrial0Enabled = true;
+		}
+	}
+}
+
+function GetBowlingGameScore(aBowlingFrame)
+{
+	var iTotalScore;
+    var iFrameIndex;
+
+	iTotalScore = 0;
+	for (iFrameIndex = 0; iFrameIndex < 10; iFrameIndex++)
+	{
+		iTotalScore += GetFrameScore (aBowlingFrame[iFrameIndex]);
+		if (IsStrike (aBowlingFrame[iFrameIndex]))
+		{
+			if (IsStrike (aBowlingFrame[iFrameIndex + 1]))
+				iTotalScore += aBowlingFrame[iFrameIndex + 2][0];
+			iTotalScore += GetFrameScore (aBowlingFrame[iFrameIndex + 1]);
+		}
+		else
+		if (IsSpare (aBowlingFrame[iFrameIndex]))
+		{
+			iTotalScore += aBowlingFrame[iFrameIndex + 1][0];
+		}
+	}
+	return iTotalScore;
+}
+</script>
+
+</body>
+</html>
